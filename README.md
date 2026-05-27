@@ -17,7 +17,8 @@ Example speeds in the script & screenshot: 0.1, 0.25, 0.33, 0.5, 0.66, 0.75, 1, 
 Playback speed range: `0.0625x` - `16x`  
 Behavior depends on the Chrome/Chromium video engine, not on Jellyfin.
 
-Note: During testing, values below `0.1x` could cause problems when switching back to very high speeds afterwards.<br>
+Note:<br>
+During testing, values below `0.1x` could cause problems when switching back to very high speeds afterwards.<br>
 Playback & audio also became very choppy and pitchy, although audio still continued to work.<br>
 For practical use, the recommended minimum speed is around `0.2x` to `0.25x`.
 
