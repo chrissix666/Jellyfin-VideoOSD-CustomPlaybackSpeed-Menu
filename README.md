@@ -8,7 +8,7 @@ Screenshot & provided in the Script are only examples.
 Default/Vanilla ones are 11 speeds: 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.5, 3, 3.5, 4
 
 Customizes the Jellyfin Web VideoOSD playback speed menu.  
-**You can define your own speed list, add custom values, remove unwanted vanilla/default entries, and keep the menu sorted.**
+**You can define your own speed list, add custom values, remove unwanted vanilla/default entries.**
 
 Example speeds in the script & screenshot: 0.1, 0.25, 0.33, 0.5, 0.66, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.5, 3, 3.5, 4, 5, 10
 
