@@ -3,7 +3,70 @@
 // playback speed range: 0.0625x - 16x
 
 (function () {
-    const SPEEDS = [0.1, 0.25, 0.33, 0.5, 0.66, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.5, 3, 3.5, 4, 5, 10];
+    // ---- PLUGIN ADAPTER: config source, retrofit for VideoOSD Tweaks and Candy ----
+    const PLUGIN_GUID = '468b1980-7a6c-4e45-a129-24825085ece4';
+
+    // The 11 real vanilla Jellyfin default speeds, confirmed directly from
+    // htmlVideoPlayer/plugin.js's own getSupportedPlaybackRates().
+    const VANILLA_SPEED_FIELD_MAP = {
+        0.5: 'VanillaSpeed0_5',
+        0.75: 'VanillaSpeed0_75',
+        1: 'VanillaSpeed1_0',
+        1.25: 'VanillaSpeed1_25',
+        1.5: 'VanillaSpeed1_5',
+        1.75: 'VanillaSpeed1_75',
+        2: 'VanillaSpeed2_0',
+        2.5: 'VanillaSpeed2_5',
+        3: 'VanillaSpeed3_0',
+        3.5: 'VanillaSpeed3_5',
+        4: 'VanillaSpeed4_0'
+    };
+
+    async function fetchPluginConfig() {
+        if (!window.ApiClient || typeof ApiClient.getPluginConfiguration !== 'function') {
+            return null;
+        }
+        try {
+            return await ApiClient.getPluginConfiguration(PLUGIN_GUID);
+        } catch (err) {
+            return null;
+        }
+    }
+
+    // Builds the final speed list from the plugin's two separate lists
+    // (Vanilla Speeds individually toggleable off, Custom Speeds freely
+    // added and toggled on), per the concept: "the actually-available
+    // combined speed list is derived automatically from these two, no
+    // separate third list needed". Falls back to the exact original
+    // hardcoded SPEEDS list when there's no plugin config at all
+    // (standalone JS-injector usage), zero behavior change for that case.
+    function buildSpeedsFromPluginConfig(pluginConfig) {
+        if (!pluginConfig) return null;
+
+        const enabledVanilla = Object.keys(VANILLA_SPEED_FIELD_MAP)
+            .map(Number)
+            .filter(value => pluginConfig[VANILLA_SPEED_FIELD_MAP[value]] !== false);
+
+        const customValues = String(pluginConfig.CustomSpeedValues || '')
+            .split(',')
+            .map(s => parseFloat(s.trim()))
+            .filter(v => !Number.isNaN(v) && v >= 0.0625 && v <= 16);
+
+        const merged = [...new Set([...enabledVanilla, ...customValues])];
+        return merged.length ? merged : enabledVanilla;
+    }
+    // ---- END PLUGIN ADAPTER ----
+
+    // ============================================================
+    // == STANDALONE VALUE (JavaScript Injector, no plugin) ==
+    // "let", not "const": this list can be REBUILT once plugin
+    // config arrives (see PLUGIN ADAPTER above and the .then() call
+    // near the bottom of this file). If no plugin config is ever
+    // fetched (standalone JS-injector usage), this array is simply
+    // never reassigned -- this exact hardcoded list stays in effect
+    // untouched, identical to before this retrofit.
+    // ============================================================
+    let SPEEDS = [0.1, 0.25, 0.33, 0.5, 0.66, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.5, 3, 3.5, 4, 5, 10];
 
     window.JellyfinCustomPlaybackSpeed = {
         SPEEDS: SPEEDS
@@ -163,4 +226,22 @@
         childList: true,
         subtree: true
     });
+
+    // ---- PLUGIN ADAPTER: apply fetched config once it arrives ----
+    // Fired in parallel, not awaited before the observer starts above, so
+    // standalone (no-plugin) behavior is unaffected. If a plugin config
+    // does arrive, SPEEDS (and the shared window.JellyfinCustomPlaybackSpeed
+    // object Speed-Buttons.js reads from) is rebuilt from it. This
+    // normally arrives well before the user ever opens the speed menu, in
+    // the rare case it arrives after the menu was already patched once
+    // (DONE tracks that per-sheet), the new list is ready in time for the
+    // next time the menu is opened.
+    fetchPluginConfig().then(function (pluginConfig) {
+        const rebuilt = buildSpeedsFromPluginConfig(pluginConfig);
+        if (!rebuilt) return; // standalone usage, keep the original hardcoded list
+
+        SPEEDS = rebuilt;
+        window.JellyfinCustomPlaybackSpeed.SPEEDS = SPEEDS;
+    });
+    // ---- END PLUGIN ADAPTER ----
 })();
