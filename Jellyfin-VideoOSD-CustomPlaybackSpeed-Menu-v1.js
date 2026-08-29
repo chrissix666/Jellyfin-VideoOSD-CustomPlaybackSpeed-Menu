@@ -248,6 +248,8 @@
 
         SPEEDS = rebuilt;
         window.JellyfinCustomPlaybackSpeed.SPEEDS = SPEEDS;
+    }).catch(function (err) {
+        console.error('[VideoOSD Speed Menu] config apply failed:', err);
     });
     // ---- END PLUGIN ADAPTER ----
 })();
