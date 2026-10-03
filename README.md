@@ -13,7 +13,7 @@ Note: This script is also compatible with the [Jellyfin-VideoOSD-CustomPlaybackS
 !!BEFORE USE, CONFIG THE SPEEDS IN THE .js TO YOUR OWN NEEDS ON TOP FIRST!!<br>
 Screenshot & provided in the Script are only examples.
 
-Tested on & Requirements: Windows 11, Chrome, Jellyfin Web (10.10.7), JavaScript Injector.
+Tested on & Requirements: Windows 11, Chrome, Jellyfin Web (10.10.7 and 12.0+), JavaScript Injector.
 
 Default/Vanilla ones are 11 speeds: 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.5, 3, 3.5, 4
 
@@ -57,7 +57,7 @@ Ultra-high speeds, on the other hand, worked like a charm in testing.
 
 ## Tested On
 
-- Jellyfin Web 10.10.7
+- Jellyfin Web 10.10.7 and 12.0+
 - Google Chrome
 - Windows 11
 
